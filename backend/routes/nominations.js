@@ -16,7 +16,6 @@ router.route('/add').post(async (req, res) => {
     const newNomination = new Nomination ({
       title: req.body.title,
       year: req.body.year,
-      id: req.body.id,
     });
 
     const results = await newNomination.save();
@@ -27,7 +26,7 @@ router.route('/add').post(async (req, res) => {
   }
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/delete/:id').delete(async (req, res) => {
   try {
     const results = await Nomination.findByIdAndDelete(req.params.id);
     console.log(results);

@@ -45,7 +45,7 @@ const Home = () => {
   };
 
 
-  const addMovie = async () => {
+  const addNomination = async () => {
     try {
       const params = {
         method: 'post',
@@ -74,11 +74,30 @@ const Home = () => {
     e.preventDefault();
     setActive(false);
     setDisabled(true);
-    addMovie();
+    addNomination();
   };
+
+  const deleteNomination = async (id) => {
+    try {
+      const params = {
+        method: 'delete',
+        url: `http://localhost:8000/nominations/delete/${id}`,
+      };
+
+      const deleteResults = await axios(params);
+      console.log(deleteResults);
+
+      const newNominationsResults = await axios.get('http://localhost:8000/nominations/');
+      console.log(newNominationsResults);
+      setNominations(newNominationsResults.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const onDelete = (e) => {
     e.preventDefault();
+    deleteNomination(e.target.value);
   };
 
   return (
@@ -158,6 +177,7 @@ const Home = () => {
                           <Button 
                             className="float-right" 
                             onClick={onDelete}
+                            value={entry._id}
                             variant='info' 
                             size='sm'
                           >
