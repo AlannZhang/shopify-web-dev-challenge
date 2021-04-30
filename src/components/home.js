@@ -7,15 +7,32 @@ const Home = () => {
   const [movieTitle, setMovieTitle] = useState('');
   const [movieData, setMovieData] = useState({});
   const [showMovieData, setShowMovieData] = useState(false);
+  const [nominations, setNominations] = useState([]);
   const [active, setActive] = useState(true);
   const [disabled, setDisabled] = useState(false);
-  const apiUrl = `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_API_KEY}&t=${movieTitle}&type=movie`;
+  const apiUrl = `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie`;
 
+
+  useEffect(() => {
+    const getNominations = async () => {
+      try {
+        const results = await axios.get('http://localhost:8000/nominations/');
+        console.log(results);
+        setNominations(results.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getNominations();
+  }, []);
+
+  // retrieve movie data from omdb api
   const searchMovieTitle = async () => {
     try {
       const results = await axios.get(apiUrl);
-      console.log(results);
       setMovieData(results.data);
+      console.log(results.data);
     } catch (error) {
       console.error(error);
     }
@@ -27,10 +44,41 @@ const Home = () => {
     searchMovieTitle();
   };
 
-  const nominate = (e) => {
+
+  const addMovie = async () => {
+    try {
+      const params = {
+        method: 'post',
+        url: 'http://localhost:8000/nominations/add/',
+        data: {
+          title: movieData.Title,
+          year: movieData.Year,
+          id: movieData.imdbID,
+        },
+      };
+
+      const addedResults = await axios(params);
+      console.log(addedResults);
+
+      const newNominationsResults = await axios.get('http://localhost:8000/nominations/');
+      console.log(newNominationsResults);
+      setNominations(newNominationsResults.data);
+      setActive(true);
+      setDisabled(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const onNominate = (e) => {
     e.preventDefault();
     setActive(false);
     setDisabled(true);
+    addMovie();
+  };
+
+  const onDelete = (e) => {
+    e.preventDefault();
   };
 
   return (
@@ -70,7 +118,7 @@ const Home = () => {
                         {active && (
                           <Button 
                             className="float-right" 
-                            onClick={nominate}
+                            onClick={onNominate}
                             variant='info' 
                             size='sm'
                           >
@@ -80,7 +128,6 @@ const Home = () => {
                         {disabled && (
                           <Button 
                             className="float-right" 
-                            onClick={nominate}
                             variant='info' 
                             size='sm'
                             disabled
@@ -100,6 +147,27 @@ const Home = () => {
           <Card>
             <Card.Body>
               <h6><strong>Nominations</strong></h6>
+              <ListGroup as="ul">
+                  {nominations.map((entry) => (
+                    <ListGroup.Item as='li' id={entry.id}>
+                      <Row>
+                        <Col md={6}>
+                          <h6>{entry.title} ({entry.year})</h6>
+                        </Col>
+                        <Col md={{ span: 3, offset: 3 }}>
+                          <Button 
+                            className="float-right" 
+                            onClick={onDelete}
+                            variant='info' 
+                            size='sm'
+                          >
+                            Remove
+                          </Button>
+                        </Col>
+                      </Row>
+                    </ListGroup.Item>
+                  ))}
+              </ListGroup>
             </Card.Body>
           </Card>
         </Col>
