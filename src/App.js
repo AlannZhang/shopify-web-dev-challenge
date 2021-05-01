@@ -5,7 +5,7 @@ import Home from './components/home';
 
 const App = () => (
   <Router>
-    <Container fluid style={{ paddingLeft: 5, paddingRight: 5 }}>
+    <Container fluid style={{ paddingLeft: 80, paddingRight: 80, marginLeft: 'auto', marginRight: 'auto' }}>
       <Switch>
         <Route exact path='/' component={Home} />
       </Switch>
