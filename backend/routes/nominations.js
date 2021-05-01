@@ -13,9 +13,12 @@ router.route('/').get(async (req, res) => {
 
 router.route('/add').post(async (req, res) => {
   try {
+    console.log(req.body.rating);
+
     const newNomination = new Nomination ({
       title: req.body.title,
       year: req.body.year,
+      rating: req.body.rating,
     });
 
     const results = await newNomination.save();

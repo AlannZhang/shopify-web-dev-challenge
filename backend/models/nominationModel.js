@@ -10,6 +10,10 @@ const schema = new Schema({
     type: String,
     required: true,
   },
+  rating: {
+    type: String,
+    required: true,
+  },
 }, {
   timestamps: true,
 });
