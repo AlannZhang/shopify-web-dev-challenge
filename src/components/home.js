@@ -13,13 +13,15 @@ const Home = () => {
   const [movieData, setMovieData] = useState({});
   const [showMovieData, setShowMovieData] = useState(false);
   const [nominations, setNominations] = useState([]);
-  let rating;
+  const [rating, setRating] = useState('');
   const [active, setActive] = useState(true);
   const [disabled, setDisabled] = useState(false);
   const [showNominatedNotification, setNominatedNotification] = useState(false);
   const [showDeletedNotification, setDeletedNotification] = useState(false);
   const [showRating, setShowRating] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
 
+  // retrieve all nominations
   useEffect(() => {
     const getNominations = async () => {
       try {
@@ -34,10 +36,18 @@ const Home = () => {
     getNominations();
   }, []);
 
+  useEffect(() => {
+    if (nominations.length === 5) {
+      console.log(nominations.length);
+      setShowBanner(true);
+    }
+  }, [nominations]);
+
   // retrieve movie data from omdb api
   const searchMovieTitle = async () => {
     try {
-      const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie`);
+      const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie&plot`);
+      console.log(results.data);
       setMovieData(results.data);
       console.log(results.data);
       setActive(true);
@@ -86,21 +96,6 @@ const Home = () => {
     addNomination();
   };
 
-  // showing movie rating and setting rating
-  const onShowRate = (e) => {
-    e.preventDefault();
-    setShowRating(true);
-    setActive(false);
-  }
-
-  const onSetRating = (e) => {
-    e.preventDefault();
-    let rating = e.target.value;
-    console.log(rating);
-    setShowRating(false);
-    setActive(true);
-  }
-
   // deleting nominations
   const deleteNomination = async (id) => {
     try {
@@ -120,6 +115,20 @@ const Home = () => {
     }
   }
 
+  // showing movie rating and setting rating
+  const onShowRate = (e) => {
+    e.preventDefault();
+    setShowRating(true);
+    setActive(false);
+  }
+
+  const onSetRating = (e) => {
+    e.preventDefault();
+    setRating(e.target.value);
+    setShowRating(false);
+    setActive(true);
+  }
+
   const onDelete = (e) => {
     e.preventDefault();
     setDeletedNotification(true);
@@ -137,9 +146,20 @@ const Home = () => {
         }
         `}
       </style>
-      <Row style={{ width: '99%', margin: '10px auto auto' }}>
+      {showBanner && (
+        <Row style={{ width: '90%', margin: '30px auto auto' }}>
+        <Card
+          style={{ width: '95%', margin: '15px auto auto' }}
+        >
+          <Card.Body>
+            <h3>You have nominated 5 movies!</h3>
+          </Card.Body>
+        </Card>
+        </Row>
+      )}
+      <Row style={{ width: '90%', margin: '30px auto auto' }}>
         <Col className='d-flex flex-row' md={3}>
-          <h1 style={{margin: '30px auto auto'}}>The Shoppies 🏆</h1>
+          <h2>The Shoppies</h2>
         </Col>
         <Col md={{ span: 3, offset: 6 }}>
         <Toast 
@@ -168,9 +188,9 @@ const Home = () => {
         </Toast> 
         </Col>
       </Row>
-      <Row>
+      <Row style={{ width: '95%', margin: '15px auto auto' }}>
         <Card
-          style={{ width: '90%', margin: '40px auto auto' }}
+          style={{ width: '95%', margin: '15px auto auto' }}
         >
           <Card.Body>
             <h6><strong>Movie title</strong></h6>
@@ -200,22 +220,21 @@ const Home = () => {
       </Row>
       <Row style={{ width: '95%', margin: '40px auto auto' }}>
         <Col className='col-6'>
-          <Card>
+          <Card style={{ width: '95%', margin: 'auto' }}>
             <Card.Body>
               <h6><strong>Results for {movieTitle}</strong></h6>
               {showMovieData && (
                 <ListGroup as='ul'>
                   <ListGroup.Item as='li'>
                     <Row>
-                      <Col md={6}>
-                        <h6>{movieData.Title} ({movieData.Year}) {movieData.rating}</h6>
+                      <Col>
+                        <h6>{movieData.Title} ({movieData.Year})</h6>
                       </Col>
-                      <Col md={{ span: 3, offset: 3 }}>
+                      <Col>
                         {active && (
                           <Row>
-                            <Col md={6}>
+                            <Col>
                               <Button 
-                                className='float-right' 
                                 onClick={onNominate}
                                 variant='info' 
                                 size='sm'
@@ -223,9 +242,8 @@ const Home = () => {
                                 Nominate
                               </Button>
                             </Col>
-                            <Col md={{ span: 3, offset: 2 }}>
+                            <Col>
                               <Button 
-                                className='float-right mr-2' 
                                 onClick={onShowRate}
                                 variant='dark' 
                                 size='sm'
@@ -237,7 +255,7 @@ const Home = () => {
                         )}
                         {disabled && (
                           <Row>
-                          <Col md={6}>
+                          <Col>
                             <Button 
                               className='float-right' 
                               onClick={onNominate}
@@ -248,7 +266,7 @@ const Home = () => {
                               Nominate
                             </Button>
                           </Col>
-                          <Col md={{ span: 3, offset: 2 }}>
+                          <Col>
                             <Button 
                               className='float-right mr-2' 
                               onClick
@@ -283,15 +301,15 @@ const Home = () => {
           </Card>
         </Col>
         <Col className='col-6'>
-          <Card>
+          <Card style={{ width: '95%', margin: 'auto' }}>
             <Card.Body>
               <h6><strong>Nominations</strong></h6>
               <ListGroup as='ul'>
                   {nominations.map((entry) => (
-                    <ListGroup.Item as='li' id={entry.id}>
+                    <ListGroup.Item as='li' key={entry.id}>
                       <Row>
                         <Col md={6}>
-                          <h6>{entry.title} ({entry.year})</h6>
+                          <h6>{entry.title} ({entry.year})<br/><br/>{entry.rating}</h6>
                         </Col>
                         <Col md={{ span: 3, offset: 3 }}>
                           <Button 
