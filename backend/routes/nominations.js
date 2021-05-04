@@ -5,7 +5,8 @@ require('dotenv').config({path: '../.env'});
 
 // retrieves movies from omdb
 // moved omdb api call to backend due to cors issue in the frontend
-// when trying to deploy withnetlify
+// when trying to deploy with netlify
+/*
 router.route('/movies/:title').get(async (req, res) => {
   try {
     const url = `http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${req.params.title}&type=movie&plot=full`;
@@ -16,6 +17,7 @@ router.route('/movies/:title').get(async (req, res) => {
     console.error(error);
   }
 });
+*/
 
 // retrieves nominations from db
 router.route('/nominations').get(async (req, res) => {
