@@ -1,6 +1,7 @@
 const router = require('express').Router();
 let Nomination = require('../models/nominationModel');
 
+// retrieves nominations from db
 router.route('/').get(async (req, res) => {
   try {
     const results = await Nomination.find();
@@ -11,28 +12,27 @@ router.route('/').get(async (req, res) => {
   }
 });
 
+// adds nominations to db
 router.route('/add').post(async (req, res) => {
   try {
-    console.log(req.body.rating);
-
     const newNomination = new Nomination ({
       title: req.body.title,
       year: req.body.year,
       rating: req.body.rating,
+      plot: req.body.plot,
     });
 
-    const results = await newNomination.save();
-    console.log(results);
+    await newNomination.save();
     res.send('Succesfully added new nomination');
   } catch (error) {
     console.error(error);
   }
 });
 
+// deletes nominations from db
 router.route('/delete/:id').delete(async (req, res) => {
   try {
-    const results = await Nomination.findByIdAndDelete(req.params.id);
-    console.log(results);
+    await Nomination.findByIdAndDelete(req.params.id);
     res.send('Succesfully deleted nomination');
   } catch (error) {
     console.error(error);

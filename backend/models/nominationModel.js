@@ -12,8 +12,12 @@ const schema = new Schema({
   },
   rating: {
     type: String,
-    required: true,
+    required: false,
   },
+  plot: {
+    type: String,
+    required: true,
+  }
 }, {
   timestamps: true,
 });

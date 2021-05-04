@@ -12,8 +12,7 @@ app.use(express.json());
 
 const connectToDb = async () => {
   try {
-    const results = await mongoose.connect(process.env.MONGO_DB_ATLAS_URI);
-    console.log(results);
+    await mongoose.connect(process.env.MONGO_DB_ATLAS_URI);
   } catch (error) {
     console.error(error);
   }

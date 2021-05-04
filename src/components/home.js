@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from 'react';
 import { 
   Row, Col, Card, Form, ListGroup, Button, Toast, ButtonToolbar,
-  ButtonGroup,
+  ButtonGroup, Modal,
 } from 'react-bootstrap';
 import { InputAdornment, OutlinedInput } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
@@ -20,36 +20,44 @@ const Home = () => {
   const [showDeletedNotification, setDeletedNotification] = useState(false);
   const [showRating, setShowRating] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [plot, setPlot] = useState('');
 
   // retrieve all nominations
   useEffect(() => {
     const getNominations = async () => {
       try {
         const results = await axios.get('http://localhost:8000/nominations');
-        console.log(results);
         setNominations(results.data);
       } catch (error) {
         console.error(error);
       }
     };
 
+    // show banner if 5 movies are nominated
+    if (nominations.length === 5) {
+      setShowBanner(true);
+    } else {
+      setShowBanner(false);
+    }
+
     getNominations();
   }, []);
 
+  // show banner if 5 movies are nominated
   useEffect(() => {
     if (nominations.length === 5) {
-      console.log(nominations.length);
       setShowBanner(true);
+    } else {
+      setShowBanner(false);
     }
   }, [nominations]);
 
   // retrieve movie data from omdb api
   const searchMovieTitle = async () => {
     try {
-      const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie&plot`);
-      console.log(results.data);
+      const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie&plot=full`);
       setMovieData(results.data);
-      console.log(results.data);
       setActive(true);
       setDisabled(false);
     } catch (error) {
@@ -60,9 +68,9 @@ const Home = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     setShowMovieData(true);
+    setShowRating(false);
     searchMovieTitle();
   };
-
 
   // adding nominations
   const addNomination = async () => {
@@ -74,14 +82,12 @@ const Home = () => {
           title: movieData.Title,
           year: movieData.Year,
           rating,
+          plot: movieData.Plot,
         },
       };
 
-      const addedResults = await axios(params);
-      console.log(addedResults);
-
+      await axios(params);
       const newNominationsResults = await axios.get('http://localhost:8000/nominations');
-      console.log(newNominationsResults);
       setNominations(newNominationsResults.data);
     } catch (error) {
       console.error(error);
@@ -108,12 +114,17 @@ const Home = () => {
       console.log(deleteResults);
 
       const newNominationsResults = await axios.get('http://localhost:8000/nominations/');
-      console.log(newNominationsResults);
       setNominations(newNominationsResults.data);
     } catch (error) {
       console.error(error);
     }
   }
+
+  const onDelete = (id, title) => {
+    deleteNomination(id);
+    setMovieTitle(title);
+    setDeletedNotification(true)
+  };
 
   // showing movie rating and setting rating
   const onShowRate = (e) => {
@@ -129,12 +140,12 @@ const Home = () => {
     setActive(true);
   }
 
-  const onDelete = (e) => {
-    e.preventDefault();
-    setDeletedNotification(true);
-    setMovieTitle(e.target.name);
-    deleteNomination(e.target.value);
-  };
+  // show plot in modal popup
+  const onShowModal = (title, plot) => {
+    setPlot(plot);
+    setMovieTitle(title);
+    setShowModal(true);
+  }
 
   return (
     <>
@@ -145,23 +156,17 @@ const Home = () => {
           color: white;
         }
         `}
+        {`
+        .btn-transparent {
+          color: black;
+        }
+        `}
       </style>
-      {showBanner && (
-        <Row style={{ width: '90%', margin: '30px auto auto' }}>
-        <Card
-          style={{ width: '95%', margin: '15px auto auto' }}
-        >
-          <Card.Body>
-            <h3>You have nominated 5 movies!</h3>
-          </Card.Body>
-        </Card>
-        </Row>
-      )}
       <Row style={{ width: '90%', margin: '30px auto auto' }}>
-        <Col className='d-flex flex-row' md={3}>
-          <h2>The Shoppies</h2>
+        <Col className='d-flex flex-row' md={4}>
+          <h1>The Shoppies</h1>
         </Col>
-        <Col md={{ span: 3, offset: 6 }}>
+        <Col md={{ span: 4, offset: 4 }}>
         <Toast 
           role="alert"
           show={showNominatedNotification} 
@@ -182,12 +187,23 @@ const Home = () => {
           autohide
         >
           <Toast.Header>
-            <h6 className='mr-auto'><strong>Deleted {movieData.Title}</strong></h6>
+            <h6 className='mr-auto'><strong>Deleted {movieTitle}</strong></h6>
           </Toast.Header>
-          <Toast.Body>Successfully deleted your nomination for {movieData.Title}</Toast.Body>
+          <Toast.Body>Successfully deleted {movieTitle} from your nominations</Toast.Body>
         </Toast> 
         </Col>
       </Row>
+      {showBanner && (
+        <Row style={{ width: '95%', margin: '30px auto auto' }}>
+          <Card
+            style={{ width: '95%', margin: '15px auto auto' }}
+          >
+            <Card.Body>
+              <h3>You have nominated 5 movies!</h3>
+            </Card.Body>
+          </Card>
+        </Row>
+      )}
       <Row style={{ width: '95%', margin: '15px auto auto' }}>
         <Card
           style={{ width: '95%', margin: '15px auto auto' }}
@@ -228,7 +244,13 @@ const Home = () => {
                   <ListGroup.Item as='li'>
                     <Row>
                       <Col>
-                        <h6>{movieData.Title} ({movieData.Year})</h6>
+                        <Button
+                          className='bg-transparent text-left'
+                          onClick={() => onShowModal(movieData.Title, movieData.Plot)}
+                          variant='transparent'
+                        >
+                          <h6>{movieData.Title} ({movieData.Year})</h6>
+                        </Button>
                       </Col>
                       <Col>
                         {active && (
@@ -306,17 +328,23 @@ const Home = () => {
               <h6><strong>Nominations</strong></h6>
               <ListGroup as='ul'>
                   {nominations.map((entry) => (
-                    <ListGroup.Item as='li' key={entry.id}>
+                    <ListGroup.Item as='li' key={entry._id}>
                       <Row>
                         <Col md={6}>
-                          <h6>{entry.title} ({entry.year})<br/><br/>{entry.rating}</h6>
+                          <Button
+                            className='bg-transparent text-left'
+                            onClick={(e) => onShowModal(entry.title, entry.plot)}
+                            variant='transparent'
+                            style={{ textDecoration: 'none'}}
+                          >
+                            <h6>{entry.title} ({entry.year})<br/><br/>{entry.rating}</h6>
+                          </Button>
                         </Col>
                         <Col md={{ span: 3, offset: 3 }}>
                           <Button 
                             className='float-right' 
-                            onClick={onDelete}
+                            onClick={(e) => onDelete(entry._id, entry.title)}
                             value={entry._id}
-                            name={entry.Title}
                             variant='info' 
                             size='sm'
                           >
@@ -330,6 +358,16 @@ const Home = () => {
             </Card.Body>
           </Card>
         </Col>
+        <Modal
+          show={showModal}
+          onHide={() => setShowModal(false)}
+          size='lg'
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Plot of {movieTitle}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{plot}</Modal.Body>
+        </Modal>
       </Row>
     </>
   )
