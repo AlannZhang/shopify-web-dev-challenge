@@ -5,14 +5,14 @@ const serverless = require('serverless-http');
 const nominationsRouter = require('./routes/nominations');
 const app = express();
 const connection = mongoose.connection;
-require('dotenv').config({path: '../.env'});
+require('dotenv').config();
 
 app.use(cors());
 app.use(express.json());
 
 const connectToDb = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_DB_ATLAS_URI, {useNewUrlParser: true, useUnifiedTopology: true});
+    await mongoose.connect(process.env.MONGO_DB_ATLAS_URI);
   } catch (error) {
     console.error(error);
   }
@@ -20,7 +20,7 @@ const connectToDb = async () => {
 
 connectToDb();
 
-connection.once('open', {useUnifiedTopology: true}, () => {
+connection.once('open', () => {
   console.log('Connected to MongoDB database');
 });
 

@@ -17,6 +17,10 @@ const schema = new Schema({
   plot: {
     type: String,
     required: true,
+  },
+  posterUrl: {
+    type: String,
+    required: true,
   }
 }, {
   timestamps: true,

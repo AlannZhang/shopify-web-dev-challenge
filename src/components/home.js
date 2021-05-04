@@ -6,6 +6,7 @@ import {
 import { InputAdornment, OutlinedInput } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import axios from 'axios';
+import { CompareSharp } from '@material-ui/icons';
 require('dotenv').config();
 
 const Home = () => {
@@ -23,6 +24,8 @@ const Home = () => {
   const [showBanner, setShowBanner] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [plot, setPlot] = useState('');
+  const [posterUrl, setPosterUrl] = useState('');
+  let test = {};
 
   // retrieve all nominations
   useEffect(() => {
@@ -57,8 +60,7 @@ const Home = () => {
   // retrieve movie data from omdb api
   const searchMovieTitle = async () => {
     try {
-      // const results = await axios.get(`.netlify/functions/server/movies/${movieTitle}`);
-      const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie&plot=full`);
+      const results = await axios.get(`.netlify/functions/server/movies/${movieTitle}`);
       setMovieData(results.data);
       setActive(true);
       setDisabled(false);
@@ -85,6 +87,7 @@ const Home = () => {
           year: movieData.Year,
           rating,
           plot: movieData.Plot,
+          posterUrl: movieData.Poster,
         },
       };
 
@@ -113,9 +116,7 @@ const Home = () => {
         url: `.netlify/functions/server/nominations/delete/${id}`,
       };
 
-      const deleteResults = await axios(params);
-      console.log(deleteResults);
-
+      await axios(params);
       const newNominationsResults = await axios.get('.netlify/functions/server/nominations/');
       setNominations(newNominationsResults.data);
     } catch (error) {
@@ -144,9 +145,10 @@ const Home = () => {
   }
 
   // show plot in modal popup
-  const onShowModal = (title, plot) => {
+  const onShowModal = (title, plot, url) => {
     setPlot(plot);
     setMovieTitle(title);
+    setPosterUrl(url);
     setShowModal(true);
   }
 
@@ -252,7 +254,7 @@ const Home = () => {
                       <Col>
                         <Button
                           className='bg-transparent text-left'
-                          onClick={() => onShowModal(movieData.Title, movieData.Plot)}
+                          onClick={() => onShowModal(movieData.Title, movieData.Plot, movieData.Poster)}
                           variant='transparent'
                         >
                           <h6>{movieData.Title} ({movieData.Year})</h6>
@@ -339,7 +341,7 @@ const Home = () => {
                         <Col md={6}>
                           <Button
                             className='bg-transparent text-left'
-                            onClick={(e) => onShowModal(entry.title, entry.plot)}
+                            onClick={(e) => onShowModal(entry.title, entry.plot, entry.posterUrl)}
                             variant='transparent'
                             style={{ textDecoration: 'none'}}
                           >
@@ -372,7 +374,10 @@ const Home = () => {
           <Modal.Header closeButton>
             <Modal.Title>Plot of {movieTitle}</Modal.Title>
           </Modal.Header>
-          <Modal.Body>{plot}</Modal.Body>
+          <Modal.Body>
+            <Row><img src={posterUrl} alt='movie poster' style={{ textAlign: 'center', margin: '30px auto auto' }}/></Row>
+            <Row><p style={{ margin: '30px auto auto' }}>{plot}</p></Row>
+          </Modal.Body>
         </Modal>
       </Row>
     </>
