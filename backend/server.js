@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
-require('dotenv').config({path: '../.env.development'})
+require('dotenv').config({path: '../.env'})
 const nominationsRouter = require('./routes/nominations');
 const app = express();
 // const port = 8000;
@@ -10,8 +10,6 @@ const connection = mongoose.connection;
 
 app.use(cors());
 app.use(express.json());
-
-console.log(process.env.MONGO_DB_ATLAS_URI);
 
 const connectToDb = async () => {
   try {
