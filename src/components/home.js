@@ -10,6 +10,7 @@ require('dotenv').config();
 
 const Home = () => {
   const [movieTitle, setMovieTitle] = useState('');
+  const [resultsMovieTitle, setResultsMovieTitle] = useState('');
   const [movieData, setMovieData] = useState({});
   const [showMovieData, setShowMovieData] = useState(false);
   const [nominations, setNominations] = useState([]);
@@ -89,6 +90,7 @@ const Home = () => {
       await axios(params);
       const newNominationsResults = await axios.get('http://localhost:8000/nominations');
       setNominations(newNominationsResults.data);
+      setRating('');
     } catch (error) {
       console.error(error);
     }
@@ -227,7 +229,10 @@ const Home = () => {
                   variant='outlined'
                   placeholder='Search for movies by typing in a movie title...'
                   style={{ width: '100%' }}
-                  onChange={e => setMovieTitle(e.target.value)}
+                  onChange={(e) => {
+                    setMovieTitle(e.target.value);
+                    setResultsMovieTitle(e.target.value);
+                  }}
                 />
               </Form>
             </Form.Group> 
@@ -238,7 +243,7 @@ const Home = () => {
         <Col className='col-6'>
           <Card style={{ width: '95%', margin: 'auto' }}>
             <Card.Body>
-              <h6><strong>Results for {movieTitle}</strong></h6>
+              <h6><strong>Results for {resultsMovieTitle}</strong></h6>
               {showMovieData && (
                 <ListGroup as='ul'>
                   <ListGroup.Item as='li'>
