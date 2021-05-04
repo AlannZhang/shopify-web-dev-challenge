@@ -1,5 +1,6 @@
 # Shopify Fall 2021 Web Dev Challenge
 This is my challenge submission for the Shopify fall 2021 web dev Intern challenge.
+This is the link to the live version deployed using Netlify: (https://alan-zhang-shoppies.netlify.app)[https://alan-zhang-shoppies.netlify.app].
 
 ## Languages, Tools, and Frameworks
 * **JavaScript**
@@ -7,6 +8,7 @@ This is my challenge submission for the Shopify fall 2021 web dev Intern challen
 * **Express**
 * **React**
 * **Node JS**
+* **Netlify**
 
 ## Features
 My version of the Shoppies nominations application includes extra features such as:
