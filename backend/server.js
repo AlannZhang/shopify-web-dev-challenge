@@ -1,14 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config({path: '../.env'})
+const serverless = require('serverless-http');
+const bodyParser = require('body-parser');
+require('dotenv').config({path: '../.env.development'})
 const nominationsRouter = require('./routes/nominations');
 const app = express();
-const port = 8000;
+// const port = 8000;
 const connection = mongoose.connection;
 
 app.use(cors());
 app.use(express.json());
+
+console.log(process.env.MONGO_DB_ATLAS_URI);
 
 const connectToDb = async () => {
   try {
@@ -24,8 +28,14 @@ connection.once('open', () => {
   console.log('Connected to MongoDB database');
 })
 
-app.use('/nominations', nominationsRouter);
+app.use('/.netlify/functions/server', nominationsRouter);  // path must route to lambda
+// app.use('/nominations', nominationsRouter);
 
+/*
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+*/
+
+module.exports = app;
+module.exports.handler = serverless(app);
