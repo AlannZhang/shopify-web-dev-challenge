@@ -28,7 +28,7 @@ const Home = () => {
   useEffect(() => {
     const getNominations = async () => {
       try {
-        const results = await axios.get('http://localhost:8000/.netlify/functions/server/nominations');
+        const results = await axios.get('http://localhost:9000/.netlify/functions/server/nominations');
         setNominations(results.data);
       } catch (error) {
         console.error(error);
