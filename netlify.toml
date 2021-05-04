@@ -1,6 +1,2 @@
 [build]
   functions = "functions"
-
-[context.production]
-  publish = "output/"
-  environment = { MONGO_DB_ATLAS_URI = "mongodb+srv://AlanZhang:168168168@cluster0.qumwy.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", NODE_VERSION = "14.15.4" }
