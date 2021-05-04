@@ -57,8 +57,8 @@ const Home = () => {
   // retrieve movie data from omdb api
   const searchMovieTitle = async () => {
     try {
-      const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&t=${movieTitle}&type=movie&plot=full`);
-      setMovieData(results.data);
+      const results = await axios.get(`.netlify/functions/server/movies/${movieTitle}`);
+      setMovieData(results);
       setActive(true);
       setDisabled(false);
     } catch (error) {

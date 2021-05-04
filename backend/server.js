@@ -2,11 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
-require('dotenv').config({path: '../.env'})
 const nominationsRouter = require('./routes/nominations');
+const moviesRouter = require('./routes/movieData');
 const app = express();
-// const port = 8000;
 const connection = mongoose.connection;
+require('dotenv').config({path: '../.env'});
 
 app.use(cors());
 app.use(express.json());
@@ -25,14 +25,8 @@ connection.once('open', () => {
   console.log('Connected to MongoDB database');
 })
 
-app.use('/.netlify/functions/server', nominationsRouter);  // path must route to lambda
-// app.use('/nominations', nominationsRouter);
-
-/*
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-*/
+app.use('/.netlify/functions/server', nominationsRouter);
+app.use('/.netlify/functions/server', moviesRouter);
 
 module.exports = app;
 module.exports.handler = serverless(app);
