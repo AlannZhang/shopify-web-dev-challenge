@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const axios = require('axios');
+require('dotenv').config({path: '../.env'});
 
 // retrieves movies from omdb
 // moved omdb api call to backend due to cors issue in the frontend
