@@ -28,7 +28,7 @@ const Home = () => {
   useEffect(() => {
     const getNominations = async () => {
       try {
-        const results = await axios.get('http://localhost:8000/nominations');
+        const results = await axios.get('http://localhost:8000/.netlify/functions/server/nominations');
         setNominations(results.data);
       } catch (error) {
         console.error(error);
@@ -78,7 +78,7 @@ const Home = () => {
     try {
       const params = {
         method: 'post',
-        url: 'http://localhost:8000/nominations/add',
+        url: 'http://localhost:9000/.netlify/functions/server/nominations/add',
         data: {
           title: movieData.Title,
           year: movieData.Year,
@@ -88,7 +88,7 @@ const Home = () => {
       };
 
       await axios(params);
-      const newNominationsResults = await axios.get('http://localhost:8000/nominations');
+      const newNominationsResults = await axios.get('http://localhost:9000/.netlify/functions/server/nominations');
       setNominations(newNominationsResults.data);
       setRating('');
     } catch (error) {
@@ -109,13 +109,13 @@ const Home = () => {
     try {
       const params = {
         method: 'delete',
-        url: `http://localhost:8000/nominations/delete/${id}`,
+        url: `http://localhost:8000/.netlify/functions/server/nominations/delete/${id}`,
       };
 
       const deleteResults = await axios(params);
       console.log(deleteResults);
 
-      const newNominationsResults = await axios.get('http://localhost:8000/nominations/');
+      const newNominationsResults = await axios.get('http://localhost:8000/.netlify/functions/server/nominations/');
       setNominations(newNominationsResults.data);
     } catch (error) {
       console.error(error);

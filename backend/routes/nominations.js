@@ -2,7 +2,7 @@ const router = require('express').Router();
 let Nomination = require('../models/nominationModel');
 
 // retrieves nominations from db
-router.route('/').get(async (req, res) => {
+router.route('/nominations').get(async (req, res) => {
   try {
     const results = await Nomination.find();
     console.log(results);
@@ -13,7 +13,7 @@ router.route('/').get(async (req, res) => {
 });
 
 // adds nominations to db
-router.route('/add').post(async (req, res) => {
+router.route('/nominations/add').post(async (req, res) => {
   try {
     const newNomination = new Nomination ({
       title: req.body.title,
@@ -30,7 +30,7 @@ router.route('/add').post(async (req, res) => {
 });
 
 // deletes nominations from db
-router.route('/delete/:id').delete(async (req, res) => {
+router.route('/nominations/delete/:id').delete(async (req, res) => {
   try {
     await Nomination.findByIdAndDelete(req.params.id);
     res.send('Succesfully deleted nomination');

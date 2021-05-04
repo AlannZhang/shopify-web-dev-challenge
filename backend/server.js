@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
-const bodyParser = require('body-parser');
 require('dotenv').config({path: '../.env.development'})
 const nominationsRouter = require('./routes/nominations');
 const app = express();
