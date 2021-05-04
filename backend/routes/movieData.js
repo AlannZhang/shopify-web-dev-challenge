@@ -7,7 +7,8 @@ require('dotenv').config({path: '../.env'});
 // when trying to deploy withnetlify
 router.route('/movies/:title').get(async (req, res) => {
   try {
-    const results = await axios.get(`http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&t=${req.body.movieTitle}&type=movie&plot=full`);
+    const url = `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&t=${req.params.movieTitle}&type=movie&plot=full`;
+    const results = await axios.get(url);
     console.log(results);
     res.send(results.data);
   } catch (error) {

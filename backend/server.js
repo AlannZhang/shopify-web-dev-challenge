@@ -3,7 +3,6 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const serverless = require('serverless-http');
 const nominationsRouter = require('./routes/nominations');
-const moviesRouter = require('./routes/movieData');
 const app = express();
 const connection = mongoose.connection;
 require('dotenv').config({path: '../.env'});
@@ -13,7 +12,7 @@ app.use(express.json());
 
 const connectToDb = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_DB_ATLAS_URI);
+    await mongoose.connect(process.env.MONGO_DB_ATLAS_URI, {useNewUrlParser: true, useUnifiedTopology: true});
   } catch (error) {
     console.error(error);
   }
@@ -21,12 +20,10 @@ const connectToDb = async () => {
 
 connectToDb();
 
-connection.once('open', () => {
+connection.once('open', {useUnifiedTopology: true}, () => {
   console.log('Connected to MongoDB database');
-})
+});
 
 app.use('/.netlify/functions/server', nominationsRouter);
-app.use('/.netlify/functions/server', moviesRouter);
 
-module.exports = app;
 module.exports.handler = serverless(app);
